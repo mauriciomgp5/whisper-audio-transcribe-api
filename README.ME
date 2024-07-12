@@ -1,0 +1,90 @@
+
+# Whisper Transcription API
+
+This repository contains a Dockerized API for transcribing audio files using the Whisper model from OpenAI, accelerated by NVIDIA GPU. The API is built with Flask and served using Gunicorn for production readiness.
+
+## Features
+
+- **Audio Transcription**: Upload an audio file (MP3) and receive its transcription.
+- **GPU Acceleration**: Leverages NVIDIA GPUs for faster processing.
+- **Dockerized**: Easily deployable via Docker.
+
+## Requirements
+
+- Docker
+- NVIDIA GPU with CUDA support
+- NVIDIA drivers and Docker runtime for GPU (`nvidia-container-runtime`)
+
+## Setup
+
+### 1. Install NVIDIA Drivers and Docker GPU Runtime
+
+Ensure you have the NVIDIA drivers installed and the Docker runtime for GPU set up. Follow the instructions [here](https://github.com/NVIDIA/nvidia-docker).
+
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/whisper-transcription-api.git
+cd whisper-transcription-api
+```
+
+### 3. Build the Docker Image
+
+```bash
+docker build -t whisper-api .
+```
+
+### 4. Run the Docker Container
+
+```bash
+docker run --gpus all -p 5000:5000 --rm whisper-api
+```
+
+## API Usage
+
+### Endpoint
+
+`POST /transcribe`
+
+### Request
+
+- **Content-Type**: `multipart/form-data`
+- **File**: `audio` (MP3 format)
+
+### Example using `curl`
+
+```bash
+curl -X POST -F "audio=@path_to_your_audio_file.mp3" http://localhost:5000/transcribe
+```
+
+### Response
+
+```json
+{
+  "transcription": "Your transcribed text will appear here."
+}
+```
+
+## File Structure
+
+```plaintext
+whisper-transcription-api/
+├── Dockerfile
+├── app.py
+└── README.md
+```
+
+- **Dockerfile**: Defines the Docker image setup.
+- **app.py**: Contains the Flask API code.
+- **README.md**: Documentation for the project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [OpenAI](https://github.com/openai/whisper) for the Whisper model
+- [Flask](https://flask.palletsprojects.com/) for the web framework
+- [Gunicorn](https://gunicorn.org/) for the WSGI HTTP Server
+- [NVIDIA](https://www.nvidia.com/) for GPU support
