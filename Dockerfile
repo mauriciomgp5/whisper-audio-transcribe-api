@@ -18,15 +18,19 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 # Instale o PyTorch com suporte a CUDA
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-# Instale o Whisper, Flask e Gunicorn
+# Instale o Whisper, Flask, Gunicorn e ffmpeg-python
 RUN pip3 install git+https://github.com/openai/whisper.git
-RUN pip3 install Flask gunicorn
+RUN pip3 install Flask gunicorn ffmpeg-python
+
+# Baixe o modelo Whisper durante a construção do contêiner
+RUN python3 -c "import whisper; whisper.load_model('medium')"
 
 # Defina o diretório de trabalho
 WORKDIR /workspace
 
-# Copie o script da API para o contêiner
+# Copie o script da API e templates para o contêiner
 COPY app.py .
+COPY templates ./templates
 
 # Comando para executar o script com Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--timeout", "300", "app:app"]

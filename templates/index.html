@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Transcription</title>
+</head>
+
+<body>
+    <h1>Upload Audio for Transcription</h1>
+    <form id="upload-form" action="/transcribe" method="post" enctype="multipart/form-data">
+        <input type="file" name="audio" accept="audio/*" required>
+        <button type="submit">Upload and Transcribe</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/transcribe', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            const resultDiv = document.getElementById('result');
+            const audioDurationMinutes = (result.audio_duration / 60).toFixed(2);
+            resultDiv.innerHTML = `<h2>Transcription:</h2><p>${result.transcription}</p>`;
+            resultDiv.innerHTML += `<h2>Duration:</h2><p>${result.duration} seconds</p>`;
+            resultDiv.innerHTML += `<h2>Audio Duration:</h2><p>${audioDurationMinutes} minutes (${result.audio_duration} seconds)</p>`;
+            const transcriptionSpeed = (result.duration / result.audio_duration).toFixed(2);
+            resultDiv.innerHTML += `<h2>Transcription Speed:</h2><p>${transcriptionSpeed} seconds of processing per second of audio</p>`;
+            resultDiv.innerHTML += `<h2>Word Timestamps:</h2><ul>`;
+            result.word_timestamps.forEach(segment => {
+                segment.words.forEach(word => {
+                    resultDiv.innerHTML += `<li>${word.start} - ${word.end}: ${word.word}</li>`;
+                });
+            });
+            resultDiv.innerHTML += `</ul>`;
+        });
+    </script>
+</body>
+
+</html>
